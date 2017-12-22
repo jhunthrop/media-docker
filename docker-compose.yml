@@ -1,0 +1,150 @@
+version: '2'
+services:
+  sabnzbd:
+    image: linuxserver/sabnzbd
+    hostname: sabnzbd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.sabnzbd
+    links:
+      - fluentd
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    volumes:
+      - /opt/sabnzbd/config:/config
+      - /mnt/media:/media
+    depends_on:
+      - fluentd
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  plex:
+    image: linuxserver/plex
+    network_mode: "host"
+    hostname: plex
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.plex
+    volumes:
+      - /opt/plex/config:/config
+      - /mnt/media:/media
+    depends_on:
+      - fluentd
+    environment:
+      - "VERSION=latest"
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  sonarr:
+    image: linuxserver/sonarr
+    hostname: sonarr
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.sonarr
+    links:
+      - sabnzbd
+      - plex
+      - deluge
+      - jackett
+      - fluentd
+    ports:
+      - "8989:8989"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/sonarr/config:/config
+      - /mnt/media:/media
+    depends_on:
+      - fluentd
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  couchpotato:
+    image: linuxserver/couchpotato
+    hostname: couchpotato
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.couchpotato
+    links:
+      - sabnzbd
+      - deluge
+      - jackett
+      - fluentd
+    ports:
+      - "5050:5050"
+    volumes:
+      - /opt/couchpotato/config:/config
+      - /mnt/media:/media
+    depends_on:
+      - fluentd
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  deluge:
+    image: linuxserver/deluge
+    hostname: deluge
+    network_mode: "host"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.deluge
+    volumes:
+      - /opt/deluge/config:/config
+      - /mnt/media:/media
+    depends_on:
+      - fluentd
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  jackett:
+    image: linuxserver/jackett
+    hostname: jackett
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 192.168.1.188:24224
+        tag: docker.jackett
+    links:
+      - fluentd
+    ports:
+      - "9117:9117"
+    volumes:
+      - /opt/jackett/config:/config
+      - /opt/jackett/downloads:/downloads
+    depends_on:
+      - fluentd
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
+  fluentd:
+    image: fluent/fluentd
+    hostname: fluentd
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - /media/logs:/fluentd/log
+    environment:
+      - "FLUENT_UID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
