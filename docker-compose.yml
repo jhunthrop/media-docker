@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   sabnzbd:
     image: linuxserver/sabnzbd
@@ -142,9 +142,18 @@ services:
     ports:
       - "24224:24224"
       - "24224:24224/udp"
+      - "42185:42185"
+      - "42185:42185/udp"
     volumes:
-      - /media/logs:/fluentd/log
+      - /mnt/media/logs:/fluentd/log
+      - ./fluentd:/fluentd/etc/
+    healthcheck:
+      test: ["CMD", "nc", "-vnz", "192.168.1.188", "24224"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     environment:
       - "FLUENT_UID=1000"
       - "PUID=1000"
       - "TZ=America/Chicago"
+      - "FLUENTD_CONF=local.conf"
