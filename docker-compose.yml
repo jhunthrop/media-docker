@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 services:
   sabnzbd:
     image: linuxserver/sabnzbd
@@ -6,7 +6,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.sabnzbd
     links:
       - fluentd
@@ -30,7 +30,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.plex
     volumes:
       - /opt/plex/config:/config
@@ -49,7 +49,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.sonarr
     links:
       - sabnzbd
@@ -76,7 +76,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.couchpotato
     links:
       - sabnzbd
@@ -102,7 +102,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.deluge
     volumes:
       - /opt/deluge/config:/config
@@ -120,7 +120,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 192.168.1.188:24224
+        fluentd-address: 192.168.1.12:24224
         tag: docker.jackett
     links:
       - fluentd
@@ -163,7 +163,7 @@ services:
       - /mnt/media/logs:/fluentd/log
       - ./fluentd:/fluentd/etc/
     healthcheck:
-      test: ["CMD", "nc", "-vnz", "192.168.1.188", "24224"]
+      test: ["CMD", "nc", "-vnz", "192.168.1.12", "24224"]
       interval: 10s
       timeout: 3s
       retries: 3
