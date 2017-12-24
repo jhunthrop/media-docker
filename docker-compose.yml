@@ -145,7 +145,7 @@ services:
       - plex
     volumes:
       - /opt/plexpy/config:/config
-      - /opt/plex/config/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
+      - /opt/plex/config/Library/Application Support/Plex Media Server/Logs:/logs:ro
     environment:
       - "PGID=1000"
       - "PUID=1000"
