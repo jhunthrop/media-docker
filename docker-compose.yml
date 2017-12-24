@@ -136,6 +136,21 @@ services:
       - "PUID=1000"
       - "TZ=America/Chicago"
 
+
+  plexpy:
+    image: linuxserver/plexpy
+    ports:
+      - "8181:8181"
+    depends_on:
+      - plex
+    volumes:
+      - /opt/plexpy/config:/config
+      - /opt/plex/config/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
+    environment:
+      - "PGID=1000"
+      - "PUID=1000"
+      - "TZ=America/Chicago"
+
   fluentd:
     image: fluent/fluentd
     hostname: fluentd
