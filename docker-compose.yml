@@ -55,7 +55,7 @@ services:
       - sabnzbd
       - plex
       - deluge
-      - jackett
+      -
       - fluentd
     ports:
       - "8989:8989"
@@ -81,7 +81,7 @@ services:
     links:
       - sabnzbd
       - deluge
-      - jackett
+      -
       - fluentd
     ports:
       - "5050:5050"
@@ -172,3 +172,13 @@ services:
       - "PUID=1000"
       - "TZ=America/Chicago"
       - "FLUENTD_CONF=local.conf"
+
+  dns:
+    image: sameersbn/bind:9.9.5-20170626
+    hostname: dns
+    ports:
+      - "53:53"
+      - "53:53/udp"
+      - "10000:10000"
+    volumes:
+      - /mnt/media/dns:/data
