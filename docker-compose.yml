@@ -55,7 +55,7 @@ services:
       - sabnzbd
       - plex
       - deluge
-      -
+      - jackett
       - fluentd
     ports:
       - "8989:8989"
@@ -81,7 +81,7 @@ services:
     links:
       - sabnzbd
       - deluge
-      -
+      - jackett
       - fluentd
     ports:
       - "5050:5050"
