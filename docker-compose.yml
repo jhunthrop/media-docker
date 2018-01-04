@@ -140,6 +140,8 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /opt/pihole/etc/hosts:/etc/hosts
     environment:
+      - "PGID=1000"
+      - "PUID=1000"
       - "ADMIN_PASS=${PIHOLE_PASS}"
       - "SERVER_IP=${SERVER_IP}"
 
