@@ -154,7 +154,10 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    dns: 192.168.1.12
+    dns:
+      - 192.168.1.12
+    dns_search:
+      - shift.com
     environment:
       - "PGID=1000"
       - "PUID=1000"
