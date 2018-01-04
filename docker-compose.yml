@@ -147,6 +147,8 @@ services:
 
   nginx:
     image: nginx
+    depends_on:
+      - pihole
     ports:
       - "80:80"
       - "443:443"
