@@ -129,6 +129,20 @@ services:
       - "PUID=1000"
       - "TZ=America/Chicago"
 
+  pihole:
+    image: lplab/pihole
+    ports:
+      - "53:53/udp"
+      - "53:53"
+      - "8000:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /opt/pihole/etc/hosts:/etc/hosts
+    environment:
+      - "ADMIN_PASS=${PIHOLE_PASS}"
+      - "SERVER_IP=${SERVER_IP}"
+
   fluentd:
     image: fluent/fluentd
     hostname: fluentd
