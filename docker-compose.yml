@@ -149,6 +149,8 @@ services:
     image: nginx
     depends_on:
       - pihole
+    links:
+      - plex
     ports:
       - "80:80"
       - "443:443"
