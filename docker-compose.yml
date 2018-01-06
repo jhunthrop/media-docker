@@ -37,8 +37,6 @@ services:
       - /mnt/media:/media
     depends_on:
       - fluentd
-    devices:
-      - /dev/dri:/dev/dri
     environment:
       - "VERSION=latest"
       - "PGID=1000"
