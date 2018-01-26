@@ -43,8 +43,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/storage/docker/sonarr:/config
       - /mnt/media:/media
-    depends_on:
-      - fluentd
     environment:
       - "PGID=1000"
       - "PUID=1000"
@@ -86,7 +84,7 @@ services:
     depends_on:
       - plex
     volumes:
-      - /opt/plexpy/config:/config
+      - /mnt/storage/docker/plexpy:/config
       - /opt/plex/config/Library/Application Support/Plex Media Server/Logs:/logs:ro
     environment:
       - "PGID=1000"
