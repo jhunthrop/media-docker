@@ -85,7 +85,7 @@ services:
       - plex
     volumes:
       - /mnt/storage/docker/plexpy:/config
-      - /opt/plex/config/Library/Application Support/Plex Media Server/Logs:/logs:ro
+      - /mnt/storage/docker/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
     environment:
       - "PGID=1000"
       - "PUID=1000"
