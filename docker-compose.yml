@@ -3,21 +3,12 @@ services:
   sabnzbd:
     image: linuxserver/sabnzbd
     hostname: sabnzbd
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 192.168.1.12:24224
-        tag: docker.sabnzbd
-    links:
-      - fluentd
     ports:
       - "8080:8080"
       - "9090:9090"
     volumes:
-      - /opt/sabnzbd/config:/config
+      - /mnt/storage/docker/sabnzbd:/config
       - /mnt/media:/media
-    depends_on:
-      - fluentd
     environment:
       - "PGID=1000"
       - "PUID=1000"
@@ -27,16 +18,12 @@ services:
     image: linuxserver/plex
     network_mode: "host"
     hostname: plex
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 192.168.1.12:24224
-        tag: docker.plex
     volumes:
-      - /opt/plex/config:/config
+      - /mnt/storage/docker/plex:/config
       - /mnt/media:/media
-    depends_on:
-      - fluentd
+      - /tmp/transcode:/transcode
+    devices:
+      - /dev/dri:/dev/dri
     environment:
       - "VERSION=latest"
       - "PGID=1000"
@@ -46,21 +33,15 @@ services:
   sonarr:
     image: linuxserver/sonarr
     hostname: sonarr
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 192.168.1.12:24224
-        tag: docker.sonarr
     links:
       - sabnzbd
       - plex
       - deluge
-      - fluentd
     ports:
       - "8989:8989"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /opt/sonarr/config:/config
+      - /mnt/storage/docker/sonarr:/config
       - /mnt/media:/media
     depends_on:
       - fluentd
@@ -72,22 +53,14 @@ services:
   couchpotato:
     image: linuxserver/couchpotato
     hostname: couchpotato
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 192.168.1.12:24224
-        tag: docker.couchpotato
     links:
       - sabnzbd
       - deluge
-      - fluentd
     ports:
       - "5050:5050"
     volumes:
-      - /opt/couchpotato/config:/config
+      - /mnt/storage/docker/couchpotato:/config
       - /mnt/media:/media
-    depends_on:
-      - fluentd
     environment:
       - "PGID=1000"
       - "PUID=1000"
@@ -97,16 +70,9 @@ services:
     image: linuxserver/deluge
     hostname: deluge
     network_mode: "host"
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 192.168.1.12:24224
-        tag: docker.deluge
     volumes:
-      - /opt/deluge/config:/config
+      - /mnt/storage/docker/deluge:/config
       - /mnt/media:/media
-    depends_on:
-      - fluentd
     environment:
       - "PGID=1000"
       - "PUID=1000"
@@ -162,25 +128,3 @@ services:
       - "PGID=1000"
       - "PUID=1000"
       - "TZ=America/Chicago"
-
-  fluentd:
-    image: fluent/fluentd
-    hostname: fluentd
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-      - "42185:42185"
-      - "42185:42185/udp"
-    volumes:
-      - /mnt/media/logs:/fluentd/log
-      - ./fluentd:/fluentd/etc/
-    healthcheck:
-      test: ["CMD", "nc", "-vnz", "192.168.1.12", "24224"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    environment:
-      - "FLUENT_UID=1000"
-      - "PUID=1000"
-      - "TZ=America/Chicago"
-      - "FLUENTD_CONF=local.conf"

@@ -1,0 +1,83 @@
+- hosts: media
+  vars_files:
+    - group_vars/all
+
+
+  tasks:
+    - include_role:
+        name: docker
+
+    - name: install packages
+      package:
+        name: "{{ item }}"
+      with_items:
+        - nfs-common
+        - openvpn
+
+    - name: manage mount paths
+      file:
+        state: directory
+        path: "{{ item.local }}"
+      with_items: "{{ nfs_mounts }}"
+
+    - name: manage media nfs mount
+      mount:
+        path: "{{ item.local }}"
+        src: "{{ nas }}:{{ item.remote }}"
+        fstype: nfs
+        opts: "{{ nfs_opts }}"
+        state: mounted
+      with_items: "{{ nfs_mounts }}"
+
+    - name: copy openvpnauto into place
+      command: cp /mnt/storage/openvpn/openvpnauto /etc/init.d/openvpnauto
+
+    - name: copy openvpn config file
+      command: cp /mnt/storage/openvpn/CAToronto.ovpn /etc/openvpn/CAToronto.ovpn
+
+    - name: set permissions on openvpn auto
+      file:
+        path: /etc/init.d/openvpnauto
+        mode: u+x
+
+    - name: enable openvpn auto
+      service:
+        enabled: yes
+        name: openvpnauto
+
+    - name: install docker compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.18.0/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+
+    - name: manage sysctl settings
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        sysctl_set: yes
+        state: present
+        reload: yes
+      with_items:
+        - name: net.ipv4.ip_forward
+          value: 1
+        - name: net.ipv6.conf.all.forwarding
+          value: 1
+        - name: net.core.wmem_max
+          value: 12582912
+        - name: net.core.rmem_max
+          value: 12582912
+        - name: net.ipv4.tcp_rmem
+          value: " 10240 87380 12582912"
+        - name: net.ipv4.tcp_wmem
+          value: " 10240 87380 12582912"
+        - name: net.ipv4.tcp_window_scaling
+          value: 1
+        - name: net.ipv4.tcp_timestamps
+          value: 1
+        - name: net.ipv4.tcp_sack
+          value: 1
+        - name: net.ipv4.tcp_no_metrics_save
+          value: 1
+        - name: net.core.netdev_max_backlog
+          value: 5000

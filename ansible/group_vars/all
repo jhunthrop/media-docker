@@ -1,0 +1,9 @@
+nas: 192.168.1.11
+
+nfs_mounts:
+  - local: /mnt/media
+    remote: /mnt/z1-primary/media
+  - local: /mnt/storage
+    remote: /mnt/z1-primary/storage
+
+nfs_opts: "auto,nofail,noatime,nolock,intr,tcp,actimeo=1800"
